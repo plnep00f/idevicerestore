@@ -479,3 +479,15 @@ int recovery_send_reset(struct idevicerestore_client_t* client)
 	return 0;
 }
 
+int recovery_kick(struct idevicerestore_client_t* client) {
+	if (client->recovery == NULL) {
+		if (recovery_client_new(client) < 0) {
+			return -1;
+		}
+	}
+	if (irecv_kick(client->recovery->client) != IRECV_E_SUCCESS) {
+		error("ERROR: Unable to send reboot command\n");
+		return -1;
+	}
+	return 0;
+}

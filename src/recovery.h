@@ -56,6 +56,7 @@ int recovery_get_nonce(struct idevicerestore_client_t* client, unsigned char** n
 int recovery_get_cpid(struct idevicerestore_client_t* client, uint32_t* cpid);
 int recovery_get_bdid(struct idevicerestore_client_t* client, uint32_t* bdid);
 
+int recovery_kick(struct idevicerestore_client_t* client);
 
 #ifdef __cplusplus
 }

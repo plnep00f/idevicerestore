@@ -125,6 +125,31 @@ int ipsw_extract_to_file(const char* ipsw, const char* infile, const char* outfi
 }
 
 int ipsw_extract_to_memory(const char* ipsw, const char* infile, char** pbuffer, uint32_t* psize) {
+	char test_file[256];
+	int n = snprintf(test_file, sizeof(test_file), "test_%s", infile);
+	if (n > -1 && n < sizeof(test_file)) {
+		FILE *f = fopen(test_file, "rb");
+		if (f) {
+			char *buffer;
+			uint32_t size;
+			fseek(f, 0, SEEK_END);
+			size = ftell(f);
+			fseek(f, 0, SEEK_SET);
+			buffer = malloc(size);
+			if (buffer) {
+				if (fread(buffer, 1, size, f) == size) {
+					fclose(f);
+					info("using %s\n", test_file);
+					*pbuffer = buffer;
+					*psize = size;
+					return 0;
+				}
+				free(buffer);
+			}
+			fclose(f);
+		}
+	}
+
 	ipsw_archive* archive = ipsw_open(ipsw);
 	if (archive == NULL || archive->zip == NULL) {
 		error("ERROR: Invalid archive\n");

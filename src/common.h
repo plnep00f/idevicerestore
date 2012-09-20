@@ -98,6 +98,7 @@ extern "C" {
 #define FLAG_PWN            32
 
 extern int use_apple_server;
+extern int playing_with_fire;
 
 struct dfu_client_t;
 struct normal_client_t;

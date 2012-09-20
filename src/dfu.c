@@ -267,6 +267,9 @@ int dfu_enter_recovery(struct idevicerestore_client_t* client, plist_t build_ide
 		int nonce_changed = 0;
 		if (dfu_get_nonce(client, &nonce, &nonce_size) < 0) {
 			error("ERROR: Unable to get nonce from device!\n");
+			if (playing_with_fire) {
+				goto use_old_nonce_if_any;
+			}
 			return -1;
 		}
 
@@ -281,6 +284,7 @@ int dfu_enter_recovery(struct idevicerestore_client_t* client, plist_t build_ide
 			free(nonce);
 		}
 
+use_old_nonce_if_any:
 		info("Nonce: ");
 		int i;
 		for (i = 0; i < client->nonce_size; i++) {

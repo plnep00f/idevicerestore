@@ -43,6 +43,7 @@
 #define VERSION_XML "cache/version.xml"
 
 int use_apple_server;
+int playing_with_fire;
 
 static struct option longopts[] = {
 	{ "ecid",    required_argument, NULL, 'i' },
@@ -52,6 +53,7 @@ static struct option longopts[] = {
 	{ "kick",    no_argument,       NULL, 'k' },
 	{ "erase",   no_argument,       NULL, 'e' },
 	{ "custom",  no_argument,       NULL, 'c' },
+	{ "fire",    no_argument,       NULL, 'f' },
 	{ "cydia",   no_argument,       NULL, 's' },
 	{ "exclude", no_argument,       NULL, 'x' },
 	{ "shsh",    no_argument,       NULL, 't' },
@@ -73,6 +75,7 @@ void usage(int argc, char* argv[]) {
 	printf("  -k|--kick       Kick device out of recovery mode\n");
 	printf("  -e|--erase      perform a full restore, erasing all data\n");
 	printf("  -c|--custom     restore with a custom firmware\n");
+	printf("  -f|--fire       Playing with fire: ignore missing nonces, signatures\n");
 	printf("  -s|--cydia      use Cydia's signature service instead of Apple's\n");
 	printf("  -x|--exclude    exclude nor/baseband upgrade\n");
 	printf("  -t|--shsh       fetch TSS record and save to .shsh file, then exit\n");
@@ -154,7 +157,7 @@ int main(int argc, char* argv[]) {
 	}
 	memset(client, '\0', sizeof(struct idevicerestore_client_t));
 
-	while ((opt = getopt_long(argc, argv, "dhkcesxtpPi:u:", longopts, &optindex)) > 0) {
+	while ((opt = getopt_long(argc, argv, "dhkcefsxtpPi:u:", longopts, &optindex)) > 0) {
 		switch (opt) {
 		case 'h':
 			usage(argc, argv);
@@ -175,6 +178,10 @@ int main(int argc, char* argv[]) {
 
 		case 'c':
 			client->flags |= FLAG_CUSTOM;
+			break;
+
+		case 'f':
+			playing_with_fire = 1;
 			break;
 
 		case 's':
@@ -688,6 +695,9 @@ int main(int argc, char* argv[]) {
 		int nonce_changed = 0;
 		if (get_nonce(client, &nonce, &nonce_size) < 0) {
 			error("ERROR: Unable to get nonce from device!\n");
+			if (playing_with_fire) {
+				goto use_old_nonce_if_any;
+			}
 			recovery_send_reset(client);
 			return -1;
 		}
@@ -703,6 +713,7 @@ int main(int argc, char* argv[]) {
 			free(nonce);
 		}
 
+use_old_nonce_if_any:
 		info("Nonce: ");
 		int i;
 		for (i = 0; i < client->nonce_size; i++) {
@@ -1210,12 +1221,18 @@ int ipsw_get_component_by_path(const char* ipsw, plist_t tss, const char* compon
 		if (component) {
 			if (tss_get_blob_by_name(tss, component, &component_blob) < 0) {
 				error("ERROR: Unable to get SHSH blob for TSS %s entry\n", component_name);
+				if (playing_with_fire) {
+					goto do_it_anyway;
+				}
 				img3_free(img3);
 				return -1;
 			}
 		} else {
 			if (tss_get_blob_by_path(tss, path, &component_blob) < 0) {
 				error("ERROR: Unable to get SHSH blob for TSS %s entry\n", component_name);
+				if (playing_with_fire) {
+					goto do_it_anyway;
+				}
 				img3_free(img3);
 				return -1;
 			}
@@ -1229,6 +1246,7 @@ int ipsw_get_component_by_path(const char* ipsw, plist_t tss, const char* compon
 			return -1;
 		}
 
+do_it_anyway:
 		if (component_blob)
 			free(component_blob);
 

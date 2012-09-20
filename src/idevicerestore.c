@@ -356,6 +356,7 @@ int main(int argc, char* argv[]) {
 
 	/* print iOS information from the manifest */
 	build_manifest_get_version_information(buildmanifest, &client->version, &client->build);
+	client->buildno = strtoul(client->build, NULL, 10);
 
 	info("Product Version: %s\n", client->version);
 	info("Product Build: %s\n", client->build);
@@ -659,7 +660,7 @@ int main(int argc, char* argv[]) {
 		sleep(7);
 	}
 
-	if (client->build[0] > '8') {
+	if (client->buildno > 8) {
 		// we need another tss request with nonce.
 		unsigned char* nonce = NULL;
 		int nonce_size = 0;
@@ -1038,7 +1039,7 @@ int get_shsh_blobs(struct idevicerestore_client_t* client, uint64_t ecid, unsign
 	plist_t response = NULL;
 	*tss = NULL;
 
-	if ((client->build[0] <= '8') || (client->flags & FLAG_CUSTOM)) {
+	if ((client->buildno <= 8) || (client->flags & FLAG_CUSTOM)) {
 		error("checking for local shsh\n");
 
 		/* first check for local copy */

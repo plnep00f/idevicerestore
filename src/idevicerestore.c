@@ -56,6 +56,7 @@ static struct option longopts[] = {
 	{ "exclude", no_argument,       NULL, 'x' },
 	{ "shsh",    no_argument,       NULL, 't' },
 	{ "pwn",     no_argument,       NULL, 'p' },
+	{ "nopwn",   no_argument,       NULL, 'P' },
 	{ NULL, 0, NULL, 0 }
 };
 
@@ -76,6 +77,7 @@ void usage(int argc, char* argv[]) {
 	printf("  -x|--exclude    exclude nor/baseband upgrade\n");
 	printf("  -t|--shsh       fetch TSS record and save to .shsh file, then exit\n");
 	printf("  -p|--pwn        Put device in pwned DFU mode and exit (limera1n devices only)\n");
+	printf("  -P|--nopwn      Do not pwn before restoring custom fw (on-device fw is pwned)\n");
 	printf("\n");
 }
 
@@ -141,6 +143,7 @@ int main(int argc, char* argv[]) {
 	int shsh_only = 0;
 	char* shsh_dir = NULL;
 	int kick_recovery = 0;
+	int already_pwned = 0;
 	use_apple_server=1;
 
 	// create an instance of our context
@@ -151,7 +154,7 @@ int main(int argc, char* argv[]) {
 	}
 	memset(client, '\0', sizeof(struct idevicerestore_client_t));
 
-	while ((opt = getopt_long(argc, argv, "dhkcesxtpi:u:", longopts, &optindex)) > 0) {
+	while ((opt = getopt_long(argc, argv, "dhkcesxtpPi:u:", longopts, &optindex)) > 0) {
 		switch (opt) {
 		case 'h':
 			usage(argc, argv);
@@ -206,6 +209,10 @@ int main(int argc, char* argv[]) {
 
 		case 'p':
 			client->flags |= FLAG_PWN;
+			break;
+
+		case 'P':
+			already_pwned = 1;
 			break;
 
 		default:
@@ -635,7 +642,7 @@ int main(int argc, char* argv[]) {
 	// if the device is in DFU mode, place device into recovery mode
 	if (client->mode->index == MODE_DFU) {
 		recovery_client_free(client);
-		if (client->flags & FLAG_CUSTOM) {
+		if ((client->flags & FLAG_CUSTOM) && !already_pwned) {
 			info("connecting to DFU\n");
 			if (dfu_client_new(client) < 0) {
 				return -1;

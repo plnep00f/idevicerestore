@@ -49,6 +49,7 @@ static struct option longopts[] = {
 	{ "uuid",    required_argument, NULL, 'u' },
 	{ "debug",   no_argument,       NULL, 'd' },
 	{ "help",    no_argument,       NULL, 'h' },
+	{ "kick",    no_argument,       NULL, 'k' },
 	{ "erase",   no_argument,       NULL, 'e' },
 	{ "custom",  no_argument,       NULL, 'c' },
 	{ "cydia",   no_argument,       NULL, 's' },
@@ -68,6 +69,7 @@ void usage(int argc, char* argv[]) {
 	printf("                  NOTE: only works with devices in normal mode.\n");
 	printf("  -d|--debug      enable communication debugging\n");
 	printf("  -h|--help       prints usage information\n");
+	printf("  -k|--kick       Kick device out of recovery mode\n");
 	printf("  -e|--erase      perform a full restore, erasing all data\n");
 	printf("  -c|--custom     restore with a custom firmware\n");
 	printf("  -s|--cydia      use Cydia's signature service instead of Apple's\n");
@@ -138,6 +140,7 @@ int main(int argc, char* argv[]) {
 	int tss_enabled = 0;
 	int shsh_only = 0;
 	char* shsh_dir = NULL;
+	int kick_recovery = 0;
 	use_apple_server=1;
 
 	// create an instance of our context
@@ -148,7 +151,7 @@ int main(int argc, char* argv[]) {
 	}
 	memset(client, '\0', sizeof(struct idevicerestore_client_t));
 
-	while ((opt = getopt_long(argc, argv, "dhcesxtpi:u:", longopts, &optindex)) > 0) {
+	while ((opt = getopt_long(argc, argv, "dhkcesxtpi:u:", longopts, &optindex)) > 0) {
 		switch (opt) {
 		case 'h':
 			usage(argc, argv);
@@ -157,6 +160,10 @@ int main(int argc, char* argv[]) {
 		case 'd':
 			client->flags |= FLAG_DEBUG;
 			idevicerestore_debug = 1;
+			break;
+
+		case 'k':
+			kick_recovery = 1;
 			break;
 
 		case 'e':
@@ -212,7 +219,7 @@ int main(int argc, char* argv[]) {
 		argv += optind;
 
 		ipsw = argv[0];
-	} else {
+	} else if (!kick_recovery) {
 		usage(argc, argv);
 		return -1;
 	}
@@ -234,6 +241,13 @@ int main(int argc, char* argv[]) {
 		return -1;
 	}
 	info("Found device in %s mode\n", client->mode->string);
+	if (kick_recovery) {
+		if (client->mode->index == MODE_RECOVERY) {
+			return recovery_kick(client);
+		}
+		error("ERROR: Device is not in kickable mode.\n");
+		return -1;
+	}
 
 	if (client->mode->index == MODE_WTF) {
 		int cpid = 0;

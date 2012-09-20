@@ -963,7 +963,7 @@ irecv_error_t irecv_send_buffer(irecv_client_t client, unsigned char* buffer, un
 
 		if (!recovery_mode && status != 5) {
 			int retry = 0;
-			while (retry < 20) {
+			while (retry++ < 20) {
 				irecv_get_status(client, &status);
 				if (status == 5) {
 					break;
@@ -971,6 +971,7 @@ irecv_error_t irecv_send_buffer(irecv_client_t client, unsigned char* buffer, un
 				sleep(1);
 			}
 			if (status != 5) {
+				debug("ERROR: sent partial file: %lu of %lu\n", count, length);
 				return IRECV_E_USB_UPLOAD;
 			}
 		}

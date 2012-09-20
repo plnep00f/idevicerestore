@@ -224,6 +224,8 @@ irecv_error_t irecv_finish_transfer(irecv_client_t client);
 irecv_error_t irecv_recv_buffer(irecv_client_t client, char* buffer, unsigned long length);
 irecv_error_t irecv_get_device(irecv_client_t client, irecv_device_t* device);
 
+irecv_error_t irecv_kick(irecv_client_t client);
+
 #ifdef __cplusplus
 }
 #endif

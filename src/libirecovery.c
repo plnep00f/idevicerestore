@@ -1633,3 +1633,20 @@ void irecv_hexdump(unsigned char* buf, unsigned int len, unsigned int addr) {
 	}
 	printf("\n");
 }
+
+irecv_error_t irecv_kick(irecv_client_t client) {
+	irecv_error_t error;
+	error = irecv_setenv(client, "auto-boot", "true");
+	if (error != IRECV_E_SUCCESS) {
+		return error;
+	}
+	error = irecv_saveenv(client);
+	if (error != IRECV_E_SUCCESS) {
+		return error;
+	}
+	error = irecv_send_command_raw(client, "reboot");
+	if (error != IRECV_E_SUCCESS) {
+		return error;
+	}
+	return IRECV_E_SUCCESS;
+}

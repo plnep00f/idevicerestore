@@ -126,7 +126,7 @@ int ipsw_extract_to_file(const char* ipsw, const char* infile, const char* outfi
 
 int ipsw_extract_to_memory(const char* ipsw, const char* infile, char** pbuffer, uint32_t* psize) {
 	char test_file[256];
-	int n = snprintf(test_file, sizeof(test_file), "test_%s", infile);
+	int n = snprintf(test_file, sizeof(test_file), "test/%s", infile);
 	if (n > -1 && n < sizeof(test_file)) {
 		FILE *f = fopen(test_file, "rb");
 		if (f) {

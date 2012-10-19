@@ -336,6 +336,7 @@ use_old_nonce_if_any:
 			irecv_close(client->recovery->client);
 		return -1;
 	}
+	client->mode = &idevicerestore_modes[MODE_RECOVERY];
 	return 0;
 }
 

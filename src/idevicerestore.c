@@ -673,21 +673,6 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	if (client->mode->index == MODE_DFU) {
-		client->mode = &idevicerestore_modes[MODE_RECOVERY];
-	} else {
-		/* now we load the iBEC */
-		if (recovery_send_ibec(client, build_identity) < 0) {
-			error("ERROR: Unable to send iBEC\n");
-			return -1;
-		}
-		recovery_client_free(client);
-	
-		/* this must be long enough to allow the device to run the iBEC */
-		/* FIXME: Probably better to detect if the device is back then */
-		sleep(7);
-	}
-
 	if (client->buildno > 8) {
 		// we need another tss request with nonce.
 		unsigned char* nonce = NULL;
@@ -734,6 +719,19 @@ use_old_nonce_if_any:
 			}
 			fixup_tss(client->tss);
 		}
+	}
+
+	if (client->mode->index == MODE_RECOVERY) {
+		/* now we load the iBEC */
+		if (recovery_send_ibec(client, build_identity) < 0) {
+			error("ERROR: Unable to send iBEC\n");
+			return -1;
+		}
+		recovery_client_free(client);
+	
+		/* this must be long enough to allow the device to run the iBEC */
+		/* FIXME: Probably better to detect if the device is back then */
+		sleep(7);
 	}
 
 	// now finally do the magic to put the device into restore mode

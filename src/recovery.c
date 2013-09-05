@@ -276,10 +276,26 @@ int recovery_send_component(struct idevicerestore_client_t* client, plist_t buil
 int recovery_send_ibec(struct idevicerestore_client_t* client, plist_t build_identity) {
 	const char* component = "iBEC";
 	irecv_error_t recovery_error = IRECV_E_SUCCESS;
-
+	
+	if ((client->buildno > 9) && !(client->flags & FLAG_CUSTOM)) {
+		/* send ApTicket */
+		if (recovery_send_ticket(client) < 0) {
+			error("ERROR: Unable to send APTicket\n");
+			return -1;
+		}
+	}
+	
 	if (recovery_send_component(client, build_identity, component) < 0) {
 		error("ERROR: Unable to send %s to device.\n", component);
 		return -1;
+	}
+	
+	if(client->buildno > 9)
+	{
+	if (recovery_set_autoboot(client, 0) < 0) {
+		error("ERROR: Unable to send autoboot commands\n");
+		return -1;
+	}
 	}
 
 	recovery_error = irecv_send_command(client->recovery->client, "go");

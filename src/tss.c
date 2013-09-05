@@ -37,7 +37,7 @@ typedef struct {
 	char* content;
 } tss_response;
 
-plist_t tss_create_request(plist_t build_identity, uint64_t ecid, unsigned char* nonce, int nonce_size) {
+plist_t tss_create_request(plist_t build_identity, uint64_t ecid, unsigned char* nonce, int nonce_size , int buildno) {
 	uint64_t unique_build_size = 0;
 	char* unique_build_data = NULL;
 	plist_t unique_build_node = plist_dict_get_item(build_identity, "UniqueBuildID");
@@ -89,7 +89,9 @@ plist_t tss_create_request(plist_t build_identity, uint64_t ecid, unsigned char*
 	plist_t tss_request = plist_new_dict();
 	plist_dict_insert_item(tss_request, "@APTicket", plist_new_bool(1));
 	plist_dict_insert_item(tss_request, "@BBTicket", plist_new_bool(1));
-	plist_dict_insert_item(tss_request, "@HostIpAddress", plist_new_string("192.168.0.1"));
+	if( buildno < 10 ){
+		plist_dict_insert_item(tss_request, "@HostIpAddress", plist_new_string("192.168.0.1"));
+	}
 	plist_dict_insert_item(tss_request, "@HostPlatformInfo", plist_new_string("mac"));
 	plist_dict_insert_item(tss_request, "@Locality", plist_new_string("en_US"));
 	char* guid = generate_guid();
@@ -100,14 +102,20 @@ plist_t tss_create_request(plist_t build_identity, uint64_t ecid, unsigned char*
 	plist_dict_insert_item(tss_request, "@VersionInfo", plist_new_string("libauthinstall-107.3"));
 	plist_dict_insert_item(tss_request, "ApBoardID", plist_new_uint(board_id));
 	plist_dict_insert_item(tss_request, "ApChipID", plist_new_uint(chip_id));
-	plist_dict_insert_item(tss_request, "ApECID", plist_new_string(ecid_string));
+	if( buildno < 10 ){
+		plist_dict_insert_item(tss_request, "ApECID", plist_new_string(ecid_string));
+	}else{
+		plist_dict_insert_item(tss_request, "ApECID", plist_new_uint(ecid));
+	}
 	if (nonce && (nonce_size > 0)) {
 		plist_dict_insert_item(tss_request, "ApNonce", plist_new_data(nonce, nonce_size));
 	}
 	plist_dict_insert_item(tss_request, "ApProductionMode", plist_new_bool(1));
 	plist_dict_insert_item(tss_request, "ApSecurityDomain", plist_new_uint(security_domain));
+	if( buildno < 10 ){
 	plist_dict_insert_item(tss_request, "UniqueBuildID", plist_new_data(unique_build_data, unique_build_size));
 	free(unique_build_data);
+	}
 
 	// Add all firmware files to TSS request
 	plist_t manifest_node = plist_dict_get_item(build_identity, "Manifest");
@@ -135,8 +143,27 @@ plist_t tss_create_request(plist_t build_identity, uint64_t ecid, unsigned char*
 			free(key);
 			continue;
 		}
+		
+		if( buildno > 9 )
+		{
+			if (strcmp(key, "OS") == 0) {
+			free(key);
+			continue;
+			}
 
+			//plist_dict_remove_item(manifest_entry,"Info");
+
+			if (strcmp(key, "iBEC") == 0) {
+				plist_dict_insert_item(tss_request, "UniqueBuildID", plist_new_data(unique_build_data, unique_build_size));
+				free(unique_build_data);
+				}
+		}
+		
 		plist_t tss_entry = plist_copy(manifest_entry);
+		if( buildno > 9 )
+		{
+			plist_dict_remove_item(tss_entry,"Info");
+		}
 		plist_dict_insert_item(tss_request, key, tss_entry);
 		free(key);
 	}

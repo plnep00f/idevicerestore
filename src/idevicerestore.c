@@ -1106,7 +1106,7 @@ int get_shsh_blobs(struct idevicerestore_client_t* client, uint64_t ecid, unsign
 		info("Trying to fetch new SHSH blob\n");
 	}
 
-	request = tss_create_request(build_identity, ecid, nonce, nonce_size);
+	request = tss_create_request(build_identity, ecid, nonce, nonce_size , client->buildno );
 	if (request == NULL) {
 		error("ERROR: Unable to create TSS request\n");
 		return -1;

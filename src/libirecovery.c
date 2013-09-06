@@ -1563,6 +1563,105 @@ irecv_error_t irecv_get_device(irecv_client_t client, irecv_device_t* device) {
 		}
 		break;
 
+			
+	case CPID_IPHONE5:
+		if (get_bdid(client, &bdid) < 0) {
+			error("ERROR: Unable to get device BDID\n");
+			break;
+		}
+		switch(bdid){
+		case BDID_IPHONE5:
+			device = DEVICE_IPHONE5;
+			break;
+			
+		case BDID_IPHONE5_LTE:
+			device = DEVICE_IPHONE5;
+			break;
+			
+		default:
+			device = DEVICE_UNKNOWN;
+			break;
+		}
+		break;
+		
+	case CPID_IPADMINI:
+		if (get_bdid(client, &bdid) < 0) {
+			error("ERROR: Unable to get device BDID\n");
+			break;
+		}
+		switch(bdid){
+		case BDID_IPOD5G:
+			device = DEVICE_IPOD5G;
+			break;
+			
+		case BDID_IPADMini24:
+			device = DEVICE_IPADMini24;
+			break;
+
+		case BDID_IPADMini25:
+			device = DEVICE_IPADMini25;
+			break;
+
+		case BDID_IPADMini26:
+			device = DEVICE_IPADMini26;
+			break;
+			
+		default:
+			device = DEVICE_UNKNOWN;
+			break;
+		}
+		break;	
+
+	case CPID_IPAD3:
+		if (get_bdid(client, &bdid) < 0) {
+			error("ERROR: Unable to get device BDID\n");
+			break;
+		}
+		switch(bdid){
+		case BDID_IPAD3_1:
+			device = DEVICE_IPAD31;
+			break;
+			
+		case BDID_IPAD3_2:
+			device = DEVICE_IPAD32;
+			break;
+
+		case BDID_IPAD3_3:
+			device = DEVICE_IPAD33;
+			break;
+			
+		default:
+			device = DEVICE_UNKNOWN;
+			break;
+		}
+		break;
+
+	case CPID_IPAD4:
+		if (get_bdid(client, &bdid) < 0) {
+			error("ERROR: Unable to get device BDID\n");
+			break;
+		}
+		switch(bdid){
+		case BDID_IPAD4_1:
+			device = DEVICE_IPAD4_34;
+			break;
+			
+		case BDID_IPAD4_2:
+			device = DEVICE_IPAD4_35;
+			break;
+
+		case BDID_IPAD4_3:
+			device = DEVICE_IPAD4_36;
+			break;
+			
+		default:
+			device = DEVICE_UNKNOWN;
+			break;
+		}
+		break;
+
+
+
 	default:
 		device_id = DEVICE_UNKNOWN;
 		break;

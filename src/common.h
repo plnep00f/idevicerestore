@@ -48,6 +48,11 @@ extern "C" {
 #define CPID_IPAD22       8940
 #define CPID_IPAD23       8940
 #define CPID_IPHONE4S     8940
+#define CPID_IPADMINI     8942
+#define CPID_IPOD5G       8942
+#define CPID_IPAD3        8945
+#define CPID_IPHONE5      8950   
+#define CPID_IPAD4        8955
 
 #define BDID_UNKNOWN        -1
 #define BDID_IPHONE2G        0
@@ -65,6 +70,18 @@ extern "C" {
 #define BDID_IPAD22          6
 #define BDID_IPAD23          2
 #define BDID_IPHONE4S        8
+#define BDID_IPHONE5         0
+#define BDID_IPHONE5_LTE     2
+#define BDID_IPADMini24     10
+#define BDID_IPADMini25     12
+#define BDID_IPADMini26     14
+#define BDID_IPAD3_1         0
+#define BDID_IPAD3_2         2
+#define BDID_IPAD3_3         4
+#define BDID_IPAD4_1         0
+#define BDID_IPAD4_2         2
+#define BDID_IPAD4_3         4
+#define BDID_IPOD5G          0
 
 #define DEVICE_UNKNOWN      -1
 #define DEVICE_IPHONE2G      0
@@ -82,6 +99,18 @@ extern "C" {
 #define DEVICE_IPAD22       12
 #define DEVICE_IPAD23       13
 #define DEVICE_IPHONE4S     14
+#define DEVICE_IPHONE5      15
+#define DEVICE_IPHONE5_LTE  16
+#define DEVICE_IPADMini24       17
+#define DEVICE_IPADMini25       18
+#define DEVICE_IPADMini26       19
+#define DEVICE_IPAD31       20
+#define DEVICE_IPAD32       21
+#define DEVICE_IPAD33       22
+#define DEVICE_IPAD4_34       23
+#define DEVICE_IPAD4_35       24
+#define DEVICE_IPAD4_36       25
+#define DEVICE_IPOD5G       26
 
 #define MODE_UNKNOWN        -1
 #define MODE_WTF             0
@@ -177,6 +206,18 @@ static struct idevicerestore_device_t idevicerestore_devices[] = {
 	{  12, "iPad2,2", "K94AP",  6,  8940 },
 	{  13, "iPad2,3", "K95AP",  2,  8940 },
 	{  14, "iPhone4,1", "N94AP",  8,  8940 },
+	{  15, "iPhone5,1", "N41AP",  0,  8950 },
+	{  16, "iPhone5,2", "N42AP",  2,  8950 },
+	{  17, "iPad2,5", "P105AP",  10,  8942 },// iPad mini
+	{  18, "iPad2,6", "P106AP",  12,  8942 },
+	{  19, "iPad2,7", "P107AP",  14,  8942 },
+	{  20, "iPad3,1", "J1AP",  0,  8945 },// iPad 3
+	{  21, "iPad3,2", "J2AP",  2,  8945 },
+	{  22, "iPad3,3", "J2AAP",  4,  8945 },
+	{  23, "iPad3,4", "P101AP",  0,  8955 },// iPad 4
+	{  24, "iPad3,5", "P102AP",  2,  8955 },
+	{  25, "iPad3,6", "P103AP",  4,  8955 },
+	{  26, "iPod5,1", "N78AP",  0,  8942 },	
 	{ -1,  NULL,        NULL,   -1,    -1 }
 };
 
